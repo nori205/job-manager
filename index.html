@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>仕事管理</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1565C0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="仕事管理">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ======== セットアップ画面 ======== -->
+<div id="screen-setup" class="screen">
+  <div class="center-content">
+    <div class="app-logo">
+      <svg viewBox="0 0 192 192" width="72" height="72">
+        <rect width="192" height="192" rx="38" fill="#1565C0"/>
+        <path d="M148 68H128V56c0-8.8-7.2-16-16-16H80c-8.8 0-16 7.2-16 16v12H44c-8.8 0-15.9 7.2-15.9 16L28 148c0 8.8 7.2 16 16 16h104c8.8 0 16-7.2 16-16V84c0-8.8-7.2-16-16-16zM96 132c-8.8 0-16-7.2-16-16s7.2-16 16-16 16 7.2 16 16-7.2 16-16 16zm12-64H80V56h28v12z" fill="white"/>
+      </svg>
+    </div>
+    <h1 class="app-name">仕事管理</h1>
+    <p class="subtitle">初期設定</p>
+
+    <div class="setup-card">
+      <p class="setup-desc">
+        GoogleアカウントでログインするにはOAuthクライアントIDが必要です。<br>
+        <button class="link-btn" id="btn-help-toggle">設定方法を見る ▾</button>
+      </p>
+
+      <div id="setup-help" class="setup-help hidden">
+        <ol>
+          <li><a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a> でプロジェクト作成</li>
+          <li>「APIとサービス」→「Google Drive API」を有効化</li>
+          <li>「認証情報」→「OAuth 2.0 クライアントID」を作成</li>
+          <li>アプリの種類：<strong>ウェブアプリケーション</strong></li>
+          <li>「承認済みのJavaScriptオリジン」にこのアプリのURL<br>（例: <code>https://example.github.io</code>）を追加</li>
+          <li>クライアントIDをコピーして下に貼り付け</li>
+        </ol>
+        <p class="help-note">※ GitHub Pagesで無料公開するのが最も簡単です</p>
+      </div>
+
+      <label class="field-label" for="input-client-id">OAuth クライアントID</label>
+      <input type="text" id="input-client-id" class="text-input"
+        placeholder="xxxxxxxxxx.apps.googleusercontent.com">
+      <button class="btn-primary" id="btn-save-config">設定を保存してログイン画面へ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======== ログイン画面 ======== -->
+<div id="screen-login" class="screen hidden">
+  <div class="center-content">
+    <div class="app-logo">
+      <svg viewBox="0 0 192 192" width="80" height="80">
+        <rect width="192" height="192" rx="38" fill="#1565C0"/>
+        <path d="M148 68H128V56c0-8.8-7.2-16-16-16H80c-8.8 0-16 7.2-16 16v12H44c-8.8 0-15.9 7.2-15.9 16L28 148c0 8.8 7.2 16 16 16h104c8.8 0 16-7.2 16-16V84c0-8.8-7.2-16-16-16zM96 132c-8.8 0-16-7.2-16-16s7.2-16 16-16 16 7.2 16 16-7.2 16-16 16zm12-64H80V56h28v12z" fill="white"/>
+      </svg>
+    </div>
+    <h1 class="app-name">仕事管理</h1>
+    <p class="subtitle">受注・発注を一元管理</p>
+
+    <button id="btn-login" class="btn-google" disabled>
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      <span id="btn-login-text">読み込み中...</span>
+    </button>
+
+    <button class="link-btn muted" id="btn-change-config">クライアントIDを変更</button>
+  </div>
+</div>
+
+<!-- ======== メインアプリ ======== -->
+<div id="screen-app" class="screen hidden app-layout">
+
+  <!-- ヘッダー -->
+  <header class="app-header">
+    <span class="app-header-title">仕事管理</span>
+    <div class="header-right">
+      <span id="sync-dot" class="sync-dot" title="同期状態"></span>
+      <div class="avatar-wrap" id="avatar-wrap">
+        <img id="user-avatar" class="user-avatar" src="" alt="ユーザー">
+        <div class="user-menu hidden" id="user-menu">
+          <div class="user-info">
+            <span id="user-name" class="user-name-text"></span>
+            <span id="user-email" class="user-email-text"></span>
+          </div>
+          <hr class="menu-divider">
+          <button id="btn-sync" class="menu-item">今すぐ同期</button>
+          <button id="btn-logout" class="menu-item danger">ログアウト</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 合計サマリー -->
+  <div class="summary-bar">
+    <div class="summary-item received-bg">
+      <span class="summary-label">受注合計</span>
+      <span class="summary-amount" id="total-received">¥0</span>
+      <span class="summary-count" id="count-received">0件</span>
+    </div>
+    <div class="summary-item ordered-bg">
+      <span class="summary-label">発注合計</span>
+      <span class="summary-amount" id="total-ordered">¥0</span>
+      <span class="summary-count" id="count-ordered">0件</span>
+    </div>
+  </div>
+
+  <!-- タブ -->
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="received">受注</button>
+    <button class="tab-btn" data-tab="ordered">発注</button>
+  </nav>
+
+  <!-- リスト -->
+  <main class="list-area">
+    <div id="tab-received" class="tab-panel active">
+      <div id="list-received" class="job-list">
+        <div class="empty-state" id="empty-received">
+          <div class="empty-icon">📋</div>
+          <p>受注データがありません</p>
+          <p class="empty-hint">＋ で追加できます</p>
+        </div>
+      </div>
+    </div>
+    <div id="tab-ordered" class="tab-panel">
+      <div id="list-ordered" class="job-list">
+        <div class="empty-state" id="empty-ordered">
+          <div class="empty-icon">📦</div>
+          <p>発注データがありません</p>
+          <p class="empty-hint">＋ で追加できます</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FAB -->
+  <button class="fab" id="btn-add" aria-label="追加">＋</button>
+</div>
+
+<!-- ======== 追加・編集モーダル ======== -->
+<div id="modal-job" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-backdrop" id="modal-backdrop"></div>
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modal-title">追加</h2>
+      <button class="btn-icon" id="btn-modal-close" aria-label="閉じる">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="job-form" novalidate>
+        <input type="hidden" id="field-id">
+        <input type="hidden" id="field-type">
+
+        <div class="form-section">基本情報</div>
+
+        <div class="form-row">
+          <label class="field-label" for="field-order-date">
+            受注日 / 発注日 <span class="required">*</span>
+          </label>
+          <input type="date" id="field-order-date" class="text-input" required>
+        </div>
+
+        <div class="form-row">
+          <label class="field-label" for="field-content">
+            仕事内容 <span class="required">*</span>
+          </label>
+          <input type="text" id="field-content" class="text-input"
+            placeholder="仕事の内容を入力" required maxlength="200">
+        </div>
+
+        <div class="form-row">
+          <label class="field-label" for="field-amount">
+            金額 <span class="required">*</span>
+          </label>
+          <div class="input-prefix-wrap">
+            <span class="input-prefix">¥</span>
+            <input type="number" id="field-amount" class="text-input prefixed"
+              placeholder="0" min="0" step="1" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="field-label" for="field-client">取引先</label>
+          <input type="text" id="field-client" class="text-input"
+            placeholder="取引先名（任意）" maxlength="100">
+        </div>
+
+        <div class="form-section">作業日程</div>
+
+        <div class="form-row two-col">
+          <div>
+            <label class="field-label" for="field-start-date">作業開始日</label>
+            <input type="date" id="field-start-date" class="text-input">
+          </div>
+          <div>
+            <label class="field-label" for="field-delivery-date">受渡日</label>
+            <input type="date" id="field-delivery-date" class="text-input">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="field-label" for="field-completion-date">完了日</label>
+          <input type="date" id="field-completion-date" class="text-input">
+        </div>
+
+        <div class="form-section">請求・支払</div>
+
+        <div class="form-row two-col">
+          <div>
+            <label class="field-label" for="field-invoice-date">請求書発行日</label>
+            <input type="date" id="field-invoice-date" class="text-input">
+          </div>
+          <div>
+            <label class="field-label" for="field-transfer-date">振込日</label>
+            <input type="date" id="field-transfer-date" class="text-input">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="field-label" for="field-notes">メモ</label>
+          <textarea id="field-notes" class="text-input textarea"
+            placeholder="備考・メモ（任意）" rows="3" maxlength="500"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-danger hidden" id="btn-delete">削除</button>
+      <div class="footer-right">
+        <button class="btn-ghost" id="btn-cancel">キャンセル</button>
+        <button class="btn-primary small" id="btn-save">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== 削除確認ダイアログ ======== -->
+<div id="modal-confirm" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-backdrop"></div>
+  <div class="confirm-dialog">
+    <p class="confirm-msg">このデータを削除しますか？<br>この操作は取り消せません。</p>
+    <div class="confirm-btns">
+      <button class="btn-ghost" id="btn-confirm-cancel">キャンセル</button>
+      <button class="btn-danger" id="btn-confirm-ok">削除する</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======== トースト通知 ======== -->
+<div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+<!-- Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async defer onload="window._gisReady=true; window._tryInit && window._tryInit()"></script>
+<script src="app.js"></script>
+</body>
+</html>
