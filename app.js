@@ -7,6 +7,7 @@ const STORAGE_KEY_CFG  = 'jm-config';
 const STORAGE_KEY_DATA = 'jm-data';
 const DRIVE_FILE_NAME  = 'job-manager-data.json';
 const DRIVE_SCOPE      = 'https://www.googleapis.com/auth/drive.appdata';
+const DEFAULT_CLIENT_ID = '546194821391-ueimk8j1r3q510efkg526pgqot7dtn9t.apps.googleusercontent.com';
 
 // ============================================================
 // 状態
@@ -242,7 +243,11 @@ function loadFromLocal() {
 // 設定（OAuth クライアントID）
 // ============================================================
 function loadConfig() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY_CFG) || 'null'); } catch (_) { return null; }
+  try {
+    const cfg = JSON.parse(localStorage.getItem(STORAGE_KEY_CFG) || 'null');
+    if (cfg && cfg.clientId) return cfg;
+    return { clientId: DEFAULT_CLIENT_ID };
+  } catch (_) { return { clientId: DEFAULT_CLIENT_ID }; }
 }
 function saveConfig(cfg) {
   localStorage.setItem(STORAGE_KEY_CFG, JSON.stringify(cfg));
