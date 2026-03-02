@@ -1,4 +1,4 @@
-const CACHE_NAME = 'job-manager-v1';
+const CACHE_NAME = 'job-manager-v2';
 const CACHE_URLS = [
   './index.html',
   './style.css',

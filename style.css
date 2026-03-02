@@ -305,6 +305,28 @@ button { font-family: inherit; }
   50% { opacity: 0.3; }
 }
 
+/* エクスポートメニュー */
+.menu-wrap { position: relative; }
+
+.btn-icon.light {
+  color: rgba(255,255,255,0.85);
+  font-size: 20px;
+  letter-spacing: 0.05em;
+}
+.btn-icon.light:hover { background: rgba(255,255,255,0.15); }
+
+.export-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--surface);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-lg);
+  min-width: 200px;
+  overflow: hidden;
+  z-index: 200;
+}
+
 /* アバター & ユーザーメニュー */
 .avatar-wrap { position: relative; }
 
