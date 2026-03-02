@@ -37,6 +37,8 @@ window._tryInit  = function () {
   if (cfg && cfg.clientId) {
     clientId = cfg.clientId;
     initTokenClient(cfg.clientId);
+    // 前回ログイン済みなら自動でサイレントログインを試みる
+    if (cfg.wasLoggedIn) login();
   }
   maybeEnableLoginBtn();
 };
@@ -67,17 +69,27 @@ function login() {
     showToast('クライアントIDが設定されていません');
     return;
   }
-  // 初回は consent、以降は silent
-  const prompt = state.accessToken ? '' : 'consent';
+  // 前回ログイン済み or トークン保持中はサイレント、初回のみ consent
+  const cfg = loadConfig();
+  const prompt = (state.accessToken || cfg.wasLoggedIn) ? '' : 'consent';
   tokenClient.requestAccessToken({ prompt });
 }
 
 async function handleTokenResponse(resp) {
   if (resp.error) {
-    showToast('ログイン失敗: ' + resp.error);
+    // サイレントログイン失敗（interaction_required 等）はトースト不要でログイン画面へ
+    const silent = ['interaction_required', 'access_denied', 'immediate_failed'];
+    if (!silent.includes(resp.error)) {
+      showToast('ログイン失敗: ' + resp.error);
+    }
+    showScreen('screen-login');
     return;
   }
   state.accessToken = resp.access_token;
+
+  // ログイン状態を保存（次回自動ログインに使用）
+  const cfg = loadConfig();
+  saveConfig({ ...cfg, wasLoggedIn: true });
 
   // expires_in 秒前にサイレントリフレッシュを予約
   const expSec = parseInt(resp.expires_in || '3600', 10);
@@ -110,6 +122,9 @@ async function loadUserInfo() {
 
 function logout() {
   google.accounts.oauth2.revoke(state.accessToken, () => {});
+  // 自動ログインフラグをクリア
+  const cfg = loadConfig();
+  saveConfig({ ...cfg, wasLoggedIn: false });
   Object.assign(state, {
     jobs: [], user: null, driveFileId: null, accessToken: null, editingId: null,
   });
