@@ -28,6 +28,10 @@
         <div class="export-menu hidden" id="export-menu">
           <button class="menu-item" id="btn-export-json">JSONで保存（バックアップ）</button>
           <button class="menu-item" id="btn-export-csv">CSVで保存（Excel用）</button>
+          <hr class="menu-divider">
+          <button class="menu-item" id="btn-import-json">JSONから復元</button>
+          <hr class="menu-divider">
+          <button class="menu-item" id="btn-settings">自社情報設定</button>
         </div>
       </div>
     </div>
@@ -118,6 +122,16 @@
             <input type="number" id="field-amount" class="text-input prefixed"
               placeholder="0" min="0" step="1" required>
           </div>
+          <div class="tax-toggle">
+            <label class="tax-opt">
+              <input type="radio" name="field-tax-type" id="field-tax-excluded" value="excluded">
+              <span>税抜（請求書で税追加）</span>
+            </label>
+            <label class="tax-opt">
+              <input type="radio" name="field-tax-type" id="field-tax-included" value="included">
+              <span>税込（この金額が最終）</span>
+            </label>
+          </div>
         </div>
 
         <div class="form-row">
@@ -146,6 +160,12 @@
 
         <div class="form-section">請求・支払</div>
 
+        <div class="form-row">
+          <label class="field-label" for="field-invoice-number">請求書番号</label>
+          <input type="text" id="field-invoice-number" class="text-input"
+            placeholder="例: INV-001（任意）" maxlength="50">
+        </div>
+
         <div class="form-row two-col">
           <div>
             <label class="field-label" for="field-invoice-date">請求書発行日</label>
@@ -167,6 +187,7 @@
     <div class="modal-footer">
       <button class="btn-danger hidden" id="btn-delete">削除</button>
       <div class="footer-right">
+        <button class="btn-ghost hidden" id="btn-invoice">請求書を作成</button>
         <button class="btn-ghost" id="btn-cancel">キャンセル</button>
         <button class="btn-primary small" id="btn-save">保存</button>
       </div>
@@ -186,8 +207,54 @@
   </div>
 </div>
 
+<!-- ======== 自社情報設定モーダル ======== -->
+<div id="modal-settings" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-backdrop" id="settings-backdrop"></div>
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <h2 class="modal-title">自社情報設定</h2>
+      <button class="btn-icon" id="btn-settings-close" aria-label="閉じる">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="settings-form" novalidate>
+        <div class="form-section">発行者情報（請求書に表示されます）</div>
+        <div class="form-row">
+          <label class="field-label" for="settings-name">会社名 / 氏名</label>
+          <input type="text" id="settings-name" class="text-input"
+            placeholder="例: 山田 太郎" maxlength="100">
+        </div>
+        <div class="form-row">
+          <label class="field-label" for="settings-address">住所（任意）</label>
+          <input type="text" id="settings-address" class="text-input"
+            placeholder="例: 東京都渋谷区..." maxlength="200">
+        </div>
+        <div class="form-row">
+          <label class="field-label" for="settings-phone">電話番号（任意）</label>
+          <input type="text" id="settings-phone" class="text-input"
+            placeholder="例: 03-1234-5678" maxlength="50">
+        </div>
+        <div class="form-section">振込先</div>
+        <div class="form-row">
+          <label class="field-label" for="settings-bank">振込先情報（任意）</label>
+          <textarea id="settings-bank" class="text-input textarea" rows="3" maxlength="300"
+            placeholder="例: ○○銀行 △△支店&#10;普通 1234567&#10;口座名義: ヤマダ タロウ"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <div class="footer-right">
+        <button class="btn-ghost" id="btn-settings-cancel">キャンセル</button>
+        <button class="btn-primary small" id="btn-settings-save">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ======== トースト通知 ======== -->
 <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+<!-- ======== JSONインポート用ファイル入力（非表示） ======== -->
+<input type="file" id="input-import-json" accept=".json" class="hidden">
 
 <script src="app.js"></script>
 </body>
